@@ -97,7 +97,7 @@ GetAptSoftware()
 
 GetPPASoftware()
 {
-	${APT} install software-properties-common
+	${APT} install software-properties-common -y
 	local PPAList=(
 		"fish-shell/release-3"
 		"aacebedo/fasd"
@@ -114,7 +114,7 @@ GetPPASoftware()
 		"neovim"
 	)
 	name=$(_JoinBy " " "${SoftwareList[@]}")
-	${APT} install ${name} -y
+	${APT} install ${name} -y $1
 }
 
 GetNPMSoftware()
