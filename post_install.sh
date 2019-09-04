@@ -216,5 +216,4 @@ function main
 	ConfigUtilities
 }
 
-GetOSRelase
-ConfigNvim
+main
