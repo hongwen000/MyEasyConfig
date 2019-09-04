@@ -105,7 +105,7 @@ GetPPASoftware()
 		"neovim-ppa/stable"
 	)
 	for name in ${PPAList[@]}; do
-		${APT}-add-repository --yes --update ppa:${name}
+		${APT}-add-repository --yes ppa:${name}
 	done
 	local SoftwareList=(
 		"fasd"
@@ -114,7 +114,8 @@ GetPPASoftware()
 		"neovim"
 	)
 	name=$(_JoinBy " " "${SoftwareList[@]}")
-	${APT} install ${name} -y $1
+	echo $1
+	${APT} $1 install ${name} -y
 }
 
 GetNPMSoftware()
