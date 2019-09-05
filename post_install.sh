@@ -6,6 +6,7 @@ UNAME=""
 Codename=""
 Release=""
 RemoteBase="https://lixinrui000.cn/MyEasyConfig"
+ProxyUrl="$1"
 GetOSRelase()
 {
 	UNAME=$(uname | tr "[:upper:]" "[:lower:]")
@@ -34,9 +35,9 @@ GetOSRelase()
 			echo "You are running ubuntu $Codename"
 			if [ $Release -gt 14 ]
 			then
-				APT="apt"
+				APT="sudo apt"
 			else
-				APT="apt-get"
+				APT="sudo apt-get"
 			fi
 		fi
 	else
@@ -46,6 +47,31 @@ GetOSRelase()
 }
 
 _JoinBy() { local IFS="$1"; shift; echo "$*"; }
+
+_ProxyEnv() 
+{
+    local ProxyCmd="export http_proxy='"${ProxyUrl}"';export https_proxy='"${ProxyUrl}"';"
+    echo $*
+    eval "$ProxyCmd $*"
+}
+
+_ProxyApt()
+{
+    eval "${APT} -o Acquire::http::proxy='"${ProxyUrl}"' -o Acquire::https::proxy='"${ProxyUrl}"' $*"
+}
+
+
+_AddPpaIfNotExist()
+{
+    local AptSourceDir="/etc/apt/sources.list.d"
+    local PpaFileName1="$(echo $1 | cut -d'/' -f 1)"
+    local PpaFileName2="$(echo $1 | cut -d'/' -f 2)"
+    local PpaFileName=${PpaFileName1}"-"${DISTRO}"-"$PpaFileName2-"${Codename}"".list"
+    echo $PpaFileName
+    if [[ $(ls ${AptSourceDir} | grep -i ${PpaFileName}) == "" ]]; then 
+		${APT}-add-repository --yes ppa:$1
+    fi;
+}
 
 _GetFile()
 {
@@ -68,9 +94,9 @@ ConfigCNSource()
 
 ConfigPip()
 {
-    pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pip -U
+    pip2 install -i https://pypi.tuna.tsinghua.edu.cn/simple pip -U
     pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple pip -U
-    pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+    pip2 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
     pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 }
 
@@ -108,7 +134,7 @@ GetPPASoftware()
 		"neovim-ppa/stable"
 	)
 	for name in ${PPAList[@]}; do
-		${APT}-add-repository --yes ppa:${name}
+        _AddPpaIfNotExist $name
 	done
 	local SoftwareList=(
 		"fasd"
@@ -176,7 +202,7 @@ ConfigNvim()
 	curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 	# vim +PlugInstall
-    pip install neovim
+    pip2 install neovim
     ${NvimPip3} install neovim
 }
 
