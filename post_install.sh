@@ -12,7 +12,7 @@ GetOSRelase()
 	# If Linux, try to determine specific distribution
 	if [ "$UNAME" == "linux" ]; then
 	    # If available, use LSB to identify distribution
-	    if [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
+	    if [ -f /etc/lsb-release -o -d /etc/lsb-release.d ] || [ -f /var/lib/dpkg/info/lsb-release.list ]; then
 		export DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
 	    # Otherwise, use release info file
 	    else
@@ -22,11 +22,11 @@ GetOSRelase()
 	# For everything else (or if above failed), just use generic identifier
 	[ "$DISTRO" == "" ] && export DISTRO=$UNAME
 	unset UNAME
-	if [ $DISTRO == "Ubuntu" ]
+	if [ "$DISTRO" == "Ubuntu" ]
 	then 
 		Codename=`lsb_release -a | grep "Codename" | sed -rn "s|.*:\s*([a-z]*)|\1|p"`
 		Release=`lsb_release -a | grep "Release" | sed -rn "s|.*:\s*([0-9]*).*|\1|p"`
-		if [ $Codename == "" ]
+		if [ "$Codename" == "" ]
 		then
 			echo "Can not determine ubuntu version"
 			exit
@@ -39,6 +39,9 @@ GetOSRelase()
 				APT="apt-get"
 			fi
 		fi
+	else
+		echo "Not supported OS ${DISTRO}"
+		exit
 	fi
 }
 
@@ -46,6 +49,8 @@ _JoinBy() { local IFS="$1"; shift; echo "$*"; }
 
 _GetFile()
 {
+	local DownloadFileName=$1
+	local LocalFilePath=$2
 	local RemoteFilePath=${RemoteBase}/${DownloadFileName}
 	if wget --spider ${RemoteFilePath} 2>/dev/null; then
 		mkdir -p $(dirname ${LocalFilePath})
@@ -58,9 +63,7 @@ _GetFile()
 
 ConfigCNSource()
 {
-	local DownloadFileName=${DISTRO}_${Codename}_sources.list 
-	local LocalFilePath=/etc/apt/sources.list
-	_GetFile
+	_GetFile ${DISTRO}_${Codename}_sources.list /etc/apt/sources.list
 }
 
 ConfigPip()
@@ -143,12 +146,8 @@ ConfigFish()
 {
 	# install fisher
 	curl https://git.io/fisher --create-dirs -sLo ~/.config/fish/functions/fisher.fish && fisher add znculee/fish-fasd
-	local DownloadFileName=config.fish
-	local LocalFilePath=~/.config/fish/config.fish
-	_GetFile
-	local DownloadFileName=.env.sh
-	local LocalFilePath=~/.env.sh
-	_GetFile
+	_GetFile config.fish ~/.config/fish/config.fish 
+	_GetFile .env.sh ~/.env.sh
 }
 
 ConfigNvim()
@@ -156,9 +155,7 @@ ConfigNvim()
     local NvimDataDir=~/.local/share/nvim
     local NvimPython3="python3"
     local NvimPip3="pip3"
-	local DownloadFileName=init.vim
-	local LocalFilePath=~/.config/nvim/init.vim
-	_GetFile
+	_GetFile init.vim ~/.config/nvim/init.vim
     local NvimConfigFile=${LocalFilePath}
     if [ $DISTRO == "Ubuntu" ] && [ $Release -lt 18 ] ; then
         local MINICONDA_PYTHON_3_6_ADDRESS="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh"
@@ -186,9 +183,7 @@ ConfigNvim()
 ConfigTmux()
 {
 	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-	local DownloadFileName=.tmux.conf
-	local LocalFilePath=~/.tmux.conf
-	_GetFile
+	_GetFile .tmux.conf ~/.tmux.conf
 	# Hit prefix + I to fetch the plugin and source it
 }
 
@@ -217,5 +212,4 @@ function main
 	ConfigUtilities
 }
 
-GetOSRelase
-ConfigNvim
+main
