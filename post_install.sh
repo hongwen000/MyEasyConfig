@@ -144,7 +144,7 @@ GetPPASoftware()
 	)
 	name=$(_JoinBy " " "${SoftwareList[@]}")
 	echo $1
-	${APT} $1 install ${name} -y
+	_ProxyApt install ${name} -y
 }
 
 GetNPMSoftware()
@@ -162,7 +162,7 @@ ConfigCNPM()
 {
 	ln -s /usr/bin/nodejs /usr/bin/node
 	npm install -g n --registry=https://registry.npm.taobao.org
-	n stable
+	_ProxyEnv n stable
 	npm install -g npm@latest --registry=https://registry.npm.taobao.org
 	npm install -g cnpm --registry=https://registry.npm.taobao.org
 	NPM="cnpm"
