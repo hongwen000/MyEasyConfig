@@ -1,6 +1,6 @@
 #!/bin/bash
 # Determine OS platform
-APT=""
+APT="sudo apt"
 NPM=npm
 UNAME=""
 Codename=""
@@ -33,13 +33,15 @@ GetOSRelase()
 			exit
 		else
 			echo "You are running ubuntu $Codename"
-			if [ $Release -gt 14 ]
+			if [ $Release -lt 16 ]
 			then
-				APT="sudo apt"
-			else
 				APT="sudo apt-get"
 			fi
 		fi
+	elif [ "$DISTRO" == "Debian" ]
+	then
+		Codename=`lsb_release -a | grep "Codename" | sed -rn "s|.*:\s*([a-z]*)|\1|p"`
+		Release=`lsb_release -a | grep "Release" | sed -rn "s|.*:\s*([0-9]*).*|\1|p"`
 	else
 		echo "Not supported OS ${DISTRO}"
 		exit
@@ -89,7 +91,10 @@ _GetFile()
 
 ConfigCNSource()
 {
-	_GetFile ${DISTRO}_${Codename}_sources.list /etc/apt/sources.list
+	local LocalSourceList=/etc/apt/sources.list
+	if [ "$(cat $LocalSourceList | grep 'tencentyun')" == "" ] ; then
+		_GetFile ${DISTRO}_${Codename}_sources.list 
+	fi
 }
 
 ConfigPip()
