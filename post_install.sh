@@ -79,10 +79,17 @@ _GetFile()
 {
 	local DownloadFileName=$1
 	local LocalFilePath=$2
+	local UseSudo=$3
 	local RemoteFilePath=${RemoteBase}/${DownloadFileName}
 	if wget --spider ${RemoteFilePath} 2>/dev/null; then
-		mkdir -p $(dirname ${LocalFilePath})
-		wget -O ${LocalFilePath} ${RemoteFilePath}
+		if [[ ${UseSudo} == "yes" ]]; then
+			sudo mkdir -p $(dirname ${LocalFilePath})
+			sudo wget -O ${LocalFilePath} ${RemoteFilePath}
+		else
+			mkdir -p $(dirname ${LocalFilePath})
+			wget -O ${LocalFilePath} ${RemoteFilePath}
+		fi
+
 	else
 		echo "Can not retrive remote source list file ${RemoteFilePath}"
 		exit
@@ -93,7 +100,7 @@ ConfigCNSource()
 {
 	local LocalSourceList=/etc/apt/sources.list
 	if [ "$(cat $LocalSourceList | grep 'tencentyun')" == "" ] ; then
-		_GetFile ${DISTRO}_${Codename}_sources.list 
+		_GetFile ${DISTRO}_${Codename}_sources.list $LocalSourceList yes
 	fi
 }
 
@@ -154,7 +161,7 @@ GetPPASoftware()
 
 GetNPMSoftware()
 {
-	${NPM} install -g fd-find
+	sudo ${NPM} install -g fd-find
 }
 
 GetGitSoftware()
@@ -166,10 +173,10 @@ GetGitSoftware()
 ConfigCNPM()
 {
 	ln -s /usr/bin/nodejs /usr/bin/node
-	npm install -g n --registry=https://registry.npm.taobao.org
-	_ProxyEnv n stable
-	npm install -g npm@latest --registry=https://registry.npm.taobao.org
-	npm install -g cnpm --registry=https://registry.npm.taobao.org
+	sudo npm install -g n --registry=https://registry.npm.taobao.org
+	_ProxyEnv sudo n stable
+	sudo npm install -g npm@latest --registry=https://registry.npm.taobao.org
+	sudo npm install -g cnpm --registry=https://registry.npm.taobao.org
 	NPM="cnpm"
 }
 
@@ -200,9 +207,9 @@ ConfigNvim()
         ${NvimPip3} install -i https://pypi.tuna.tsinghua.edu.cn/simple pip -U
         ${NvimPip3} config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
     fi
-	update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
-	update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
-	update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
+	sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
+	sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
+	sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
 	# install vim-plug
 	curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
