@@ -55,6 +55,8 @@ _ProxyEnv()
     local ProxyCmd="export http_proxy='"${ProxyUrl}"';export https_proxy='"${ProxyUrl}"';"
     echo $*
     eval "$ProxyCmd $*"
+    export http_proxy=""
+    export https_proxy=""
 }
 
 _ProxyApt()
@@ -93,7 +95,8 @@ ConfigCNSource()
 {
 	local LocalSourceList=/etc/apt/sources.list
 	if [ "$(cat $LocalSourceList | grep 'tencentyun')" == "" ] ; then
-		_GetFile ${DISTRO}_${Codename}_sources.list 
+		_GetFile ${DISTRO}_${Codename}_sources.list ${LocalSourceList}
+        ${APT} update
 	fi
 }
 
