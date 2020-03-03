@@ -1,6 +1,6 @@
 #!/bin/bash
 # Determine OS platform
-APT="sudo apt"
+APT="sudo -E apt"
 NPM=npm
 UNAME=""
 Codename=""
@@ -73,7 +73,7 @@ _AddPpaIfNotExist()
     local PpaFileName=${PpaFileName1}"-"${DISTRO}"-"$PpaFileName2-"${Codename}"".list"
     echo $PpaFileName
     if [[ $(ls ${AptSourceDir} | grep -i ${PpaFileName}) == "" ]]; then 
-		${APT}-add-repository --yes ppa:$1
+		_ProxyEnv ${APT}-add-repository --yes ppa:$1
     fi;
 }
 
@@ -130,6 +130,7 @@ GetAptSoftware()
 		"openjdk-8-jdk"
 		"npm"
 		#utilities
+		"curl"
 		"git"
 		"tmux"
 		"silversearcher-ag"
@@ -239,6 +240,7 @@ function GetSoftware
 
 function ConfigUtilities
 {
+	ConfigPip
 	ConfigNvim
 	ConfigFish
 	ConfigTmux
