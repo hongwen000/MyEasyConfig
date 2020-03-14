@@ -216,7 +216,7 @@ ConfigNvim()
 	sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
 	sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
 	# install vim-plug
-	curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+	_ProxyEnv curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 	# vim +PlugInstall
     pip2 install neovim
