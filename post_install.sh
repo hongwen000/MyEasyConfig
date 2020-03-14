@@ -104,6 +104,7 @@ ConfigCNSource()
 	if [ "$(cat $LocalSourceList | grep 'tencentyun')" == "" ] ; then
 		_GetFile ${DISTRO}_${Codename}_sources.list $LocalSourceList yes
 	fi
+    ${APT} update
 }
 
 ConfigPip()
