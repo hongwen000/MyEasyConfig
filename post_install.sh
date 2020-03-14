@@ -239,7 +239,7 @@ function GetSoftware
 	_GetFile fd_7.4.0_amd64.deb /tmp/fd_7.4.0_amd64.deb
 	sudo dpkg -i /tmp/fd_7.4.0_amd64.deb
 # 	ConfigCNPM
-	GetNPMSoftware
+#	GetNPMSoftware
 }
 
 function ConfigUtilities
