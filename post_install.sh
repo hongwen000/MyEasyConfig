@@ -179,7 +179,7 @@ ConfigCNPM()
 {
 	ln -s /usr/bin/nodejs /usr/bin/node
 	sudo npm install -g n --registry=https://registry.npm.taobao.org
-	_ProxyEnv sudo n stable
+	_ProxyEnv sudo -E n stable
 	sudo npm install -g npm@latest --registry=https://registry.npm.taobao.org
 	sudo npm install -g cnpm --registry=https://registry.npm.taobao.org
 	NPM="cnpm"
@@ -236,7 +236,9 @@ function GetSoftware
 	GetAptSoftware
 	GetPPASoftware
 	GetGitSoftware
-	ConfigCNPM
+	_GetFile fd_7.4.0_amd64.deb /tmp/fd_7.4.0_amd64.deb
+	sudo dpkg -i /tmp/fd_7.4.0_amd64.deb
+# 	ConfigCNPM
 	GetNPMSoftware
 }
 
