@@ -5,7 +5,7 @@ NPM=npm
 UNAME=""
 Codename=""
 Release=""
-RemoteBase="https://lixinrui000.cn/MyEasyConfig"
+RemoteBase="https://lixinrui000.cn/M"
 ProxyUrl="$1"
 GetOSRelase()
 {
