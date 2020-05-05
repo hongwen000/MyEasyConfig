@@ -232,12 +232,6 @@ ConfigTmux()
 
 function GetSoftware
 {
-	ConfigCNSource
-	GetAptSoftware
-	GetPPASoftware
-	GetGitSoftware
-	_GetFile fd_7.4.0_amd64.deb /tmp/fd_7.4.0_amd64.deb
-	sudo dpkg -i /tmp/fd_7.4.0_amd64.deb
 # 	ConfigCNPM
 #	GetNPMSoftware
 }
@@ -254,6 +248,19 @@ function main
 {
 	GetOSRelase
 	${APT} install wget -y
+	ConfigCNSource
+	if [ "$DISTRO" == "Ubuntu" ]
+	then
+		if [ $Release == 16 ]
+		then
+		exit
+		fi
+	fi
+	GetAptSoftware
+	GetPPASoftware
+	GetGitSoftware
+	_GetFile fd_7.4.0_amd64.deb /tmp/fd_7.4.0_amd64.deb
+	sudo dpkg -i /tmp/fd_7.4.0_amd64.deb
 	GetSoftware
 	ConfigUtilities
 }
